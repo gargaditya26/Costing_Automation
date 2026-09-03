@@ -1,6 +1,6 @@
-const OPSNORA_LICENSE_DEFAULT={dashboard:true,costing_bundle:true,costing_unit:false,orders:false,work:false,products:true,automations:false,users:false,reports:false,settings:false};
+const OPSNORA_LICENSE_DEFAULT={dashboard:true,costing_bundle:true,costing_unit:true,orders:true,work:true,products:true,automations:true,users:true,reports:true,settings:true};
 const OPSNORA_LICENSE_LABELS={dashboard:'Dashboard',costing_bundle:'Bundle Wise Costing',costing_unit:'Unit Wise Costing',orders:'Order Tracking',work:'Work Assign',products:'Products / Items',automations:'Automations',users:'User Management',reports:'Reports',settings:'Settings'};
-const opsnoraLicense=()=>{let x=JSON.parse(localStorage.getItem('opsnoraLicense')||'null');if(!x){x={...OPSNORA_LICENSE_DEFAULT};localStorage.setItem('opsnoraLicense',JSON.stringify(x))}return x};
+const opsnoraLicense=()=>{let x=JSON.parse(localStorage.getItem('opsnoraLicense')||'null');if(!x){x={...OPSNORA_LICENSE_DEFAULT};localStorage.setItem('opsnoraLicense',JSON.stringify(x))}else{x={...OPSNORA_LICENSE_DEFAULT,...x};Object.keys(OPSNORA_LICENSE_DEFAULT).forEach(k=>x[k]=true);localStorage.setItem('opsnoraLicense',JSON.stringify(x))}return x};
 function licenseLockCard(feature){return `<div class="license-lock-card"><button type="button" class="license-lock-close" aria-label="Close">×</button><div class="license-lock-icon">🔒</div><h2>Not Available in Current Plan</h2><p class="muted">${OPSNORA_LICENSE_LABELS[feature]||'This feature'} is not available in the current plan.</p><small>Contact OPSNORA Team to enable access.</small></div>`}
 function closeLicenseOverlay(overlay, fallback){
   if(!overlay)return;
