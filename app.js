@@ -60,7 +60,7 @@ function initMobileSidebar(){
   menu.addEventListener('click',()=>{side.classList.toggle('open');sync()});
   backdrop.addEventListener('click',()=>{side.classList.remove('open');sync()});
   side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{side.classList.remove('open');sync()}));
-  document.querySelector('.main')?.addEventListener('click',()=>{if(side.classList.contains('open')){side.classList.remove('open');sync()}});
+  document.querySelector('.main')?.addEventListener('click',e=>{if(e.target.closest('#menu'))return;if(side.classList.contains('open')){side.classList.remove('open');sync()}});
   window.addEventListener('resize',()=>{if(window.innerWidth>760){side.classList.remove('open');sync()}});
 }
 
