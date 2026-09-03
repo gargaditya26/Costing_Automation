@@ -49,3 +49,18 @@ body.light{display:none!important}
   .side .nav a .ni{width:24px!important;height:24px!important;font-size:12px!important}
   .side .sidebottom{padding:8px!important;font-size:11px!important}
 }
+
+/* Mobile sidebar + license lock UX */
+.sideBackdrop{display:none;position:fixed;inset:0;background:rgba(2,5,12,.58);backdrop-filter:blur(2px);z-index:90}
+.sideBackdrop.show{display:block}
+.license-lock-card{position:relative}
+.license-lock-close{position:absolute;right:10px;top:10px;width:32px;height:32px;border:1px solid #303b5d;border-radius:10px;background:#0b1120;color:#dfe5f5;font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.license-lock-close:hover{border-color:#7542e8;background:#151d32}
+.license-page-overlay,.license-sub-overlay{touch-action:manipulation}
+@media(max-width:760px){
+  .side{z-index:100!important}
+  .license-page-overlay{padding:18px}
+  .license-lock-card{width:min(390px,calc(100vw - 36px));padding:24px 20px}
+  .license-lock-card h2{font-size:19px;padding-right:28px}
+  .license-sub-overlay .license-lock-card{transform:none}
+}
