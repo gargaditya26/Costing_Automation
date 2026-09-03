@@ -1,4 +1,4 @@
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(+n||0);let data=JSON.parse(localStorage.getItem('opsnoraCareData')||'null')||structuredClone(defaults);data.users??=[{name:'Admin User',username:'admin@gmail.com',role:'Administrator',status:'Active',last:'Just now'}];data.tasks??=[];data.orders.forEach(o=>o.history??=[]);const save=()=>{localStorage.setItem('opsnoraCareData',JSON.stringify(data));refresh()};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(+n||0);let data=JSON.parse(localStorage.getItem('opsnoraCareData')||'null')||structuredClone(defaults);data.users??=[{name:'Admin User',username:'admin@gmail.com',role:'Administrator',status:'Active',last:'Just now'}];data.tasks??=[];data.calculations??=[];data.unitCalculations??=[];data.orders.forEach(o=>o.history??=[]);const save=()=>{localStorage.setItem('opsnoraCareData',JSON.stringify(data));refresh()};
 function pathPage(){return location.pathname.split('/').pop().replace('.html','')||'index'}
 if(pathPage()!=='index'&&!sessionStorage.opsnoraCare){location.href='../index.html'}
 function fillSizes(){const a=$('#size'),b=$('#quickSize');if(a)a.innerHTML=data.products.map(p=>`<option>${p.size}</option>`).join('');if(b)b.innerHTML=data.products.map(p=>`<option>${p.size}</option>`).join('')}
@@ -22,12 +22,12 @@ $$('[data-length]').forEach(b=>b.onclick=()=>{selectedLength=b.dataset.length;up
 function calculationText(){let size=$('#size')?.value||'', wires=$('#wires')?.value||0, profit=$('#profit')?.value||0, cost100=$('#bundle100')?.textContent||money(0),cost200=$('#bundle200')?.textContent||money(0),sp100=$('#sp100')?.textContent||money(0),sp200=$('#sp200')?.textContent||money(0);return `OPSNORA · CARE Electrical\nCosting & Pricing Calculation\n\nSize: ${size} inch\nWires: ${wires}\n\n100M Cost: ${cost100}\n100M Selling Price: ${sp100}\n\n200M Cost: ${cost200}\n200M Selling Price: ${sp200}\n\nProfit: ${profit}%\nGenerated: ${new Date().toLocaleString('en-IN')}`}
 if($('#shareCalc'))$('#shareCalc').onclick=async()=>{let text=calculationText();try{if(navigator.share)await navigator.share({title:'CARE Electrical Costing',text});else await navigator.clipboard.writeText(text);alert(navigator.share?'Calculation shared.':'Calculation copied to clipboard.')}catch(e){}};
 if($('#whatsappCalc'))$('#whatsappCalc').onclick=()=>{let text=encodeURIComponent(calculationText());window.open(`https://wa.me/?text=${text}`,'_blank')};
-if($('#downloadCalc'))$('#downloadCalc').onclick=()=>{let blob=new Blob([calculationText()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`CARE-Costing-${($('#size')?.value||'calculation')}-${selectedLength}M.txt`;a.click();URL.revokeObjectURL(url)};$$('[data-mode]').forEach(b=>b.onclick=()=>{$$('[data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#bundleFields').classList.toggle('hide',b.dataset.mode!=='bundle');$('#unitFields').classList.toggle('hide',b.dataset.mode!=='unit')});['quickSize','quickLength','quickProfit'].forEach(id=>{if($('#'+id))$('#'+id).oninput=quick});if($('#clearCalc'))$('#clearCalc').onclick=()=>{if(confirm('Clear calculation history?')){data.calculations=[];save()}};if($('#newTask'))$('#newTask').onclick=()=>modal(`<h2>Assign Work</h2><label class="label">Task</label><input id="nt"><label class="label">Assign To</label><input id="na" value="Admin User"><label class="label">Priority</label><select id="np"><option>High</option><option>Medium</option><option>Low</option></select><label class="label">Status</label><select id="ns"><option>Pending</option><option>Completed</option><option>Hold</option></select><label class="label">Due Date</label><input id="nd" type="date"><button class="btn primary" id="saveTask" style="margin-top:17px">Assign Task</button>`);if($('#newUser'))$('#newUser').onclick=()=>modal(`<h2>Add User</h2><label class="label">Name</label><input id="un"><label class="label">Email / Username</label><input id="ue"><label class="label">Role</label><select id="ur"><option>Standard User</option><option>Manager</option><option>Administrator</option></select><button class="btn primary" id="saveUser" style="margin-top:17px">Create User</button>`);if($('#newOrder'))$('#newOrder').onclick=()=>modal(`<h2>New Order</h2><label class="label">Dealer</label><input id="od"><label class="label">Item</label><input id="oi"><label class="label">Quantity</label><input id="oq" type="number"><label class="label">Rate</label><input id="orate" type="number"><button class="btn primary" id="saveOrder" style="margin-top:17px">Create Order</button>`);if($('#newProduct'))$('#newProduct').onclick=()=>modal(`<h2>Add Product Master</h2><label class="label">Size (inch)</label><input id="ps"><label class="label">Wires</label><input id="pw" type="number"><label class="label">Rule</label><input id="pr" type="number" step="0.00001"><label class="label">Rod Rate</label><input id="pR" type="number"><label class="label">Weight</label><input id="pwt" type="number" step="0.00001"><label class="label">PVC Rate</label><input id="pP" type="number"><label class="label">Labour %</label><input id="pl" type="number"><button class="btn primary" id="saveProduct" style="margin-top:17px">Save Master</button>`);if($('#saveSettings'))$('#saveSettings').onclick=()=>{data.settings={rodRate:+$('#setRod').value||0,pvcRate:+$('#setPVC').value||0};save();alert('Settings saved')};if($('#resetData'))$('#resetData').onclick=()=>{if(confirm('Reset demo data?')){localStorage.removeItem('opsnoraCareData');location.reload()}};if($('#export'))$('#export').onclick=()=>{let rows=[['Time','Size','100m Cost','200m Cost','Profit','SP100','SP200'],...data.calculations.map(c=>[c.time,c.size,c.cost100,c.cost200,c.profit,c.sp100,c.sp200])];let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));a.download='opsnora-calculations.csv';a.click();URL.revokeObjectURL(a.href)};$$('[data-auto]').forEach(x=>{let k='opsAuto_'+x.dataset.auto;if(localStorage[k]==='on')x.classList.add('on');x.onclick=()=>{x.classList.toggle('on');localStorage[k]=x.classList.contains('on')?'on':'off'}})}
+if($('#downloadCalc'))$('#downloadCalc').onclick=()=>{let blob=new Blob([calculationText()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`CARE-Costing-${($('#size')?.value||'calculation')}-${selectedLength}M.txt`;a.click();URL.revokeObjectURL(url)};$$('[data-mode]').forEach(b=>b.onclick=()=>{$$('[data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#bundleFields').classList.toggle('hide',b.dataset.mode!=='bundle');$('#unitFields').classList.toggle('hide',b.dataset.mode!=='unit')});['quickSize','quickLength','quickProfit'].forEach(id=>{if($('#'+id))$('#'+id).oninput=quick});if($('#clearCalc'))$('#clearCalc').onclick=()=>{if(confirm('Clear all calculation history?')){data.calculations=[];data.unitCalculations=[];save()}};if($('#newTask'))$('#newTask').onclick=()=>modal(`<h2>Assign Work</h2><label class="label">Task</label><input id="nt"><label class="label">Assign To</label><input id="na" value="Admin User"><label class="label">Priority</label><select id="np"><option>High</option><option>Medium</option><option>Low</option></select><label class="label">Status</label><select id="ns"><option>Pending</option><option>Completed</option><option>Hold</option></select><label class="label">Due Date</label><input id="nd" type="date"><button class="btn primary" id="saveTask" style="margin-top:17px">Assign Task</button>`);if($('#newUser'))$('#newUser').onclick=()=>modal(`<h2>Add User</h2><label class="label">Name</label><input id="un"><label class="label">Email / Username</label><input id="ue"><label class="label">Role</label><select id="ur"><option>Standard User</option><option>Manager</option><option>Administrator</option></select><button class="btn primary" id="saveUser" style="margin-top:17px">Create User</button>`);if($('#newOrder'))$('#newOrder').onclick=()=>modal(`<h2>New Order</h2><label class="label">Dealer</label><input id="od"><label class="label">Item</label><input id="oi"><label class="label">Quantity</label><input id="oq" type="number"><label class="label">Rate</label><input id="orate" type="number"><button class="btn primary" id="saveOrder" style="margin-top:17px">Create Order</button>`);if($('#newProduct'))$('#newProduct').onclick=()=>modal(`<h2>Add Product Master</h2><label class="label">Size (inch)</label><input id="ps"><label class="label">Wires</label><input id="pw" type="number"><label class="label">Rule</label><input id="pr" type="number" step="0.00001"><label class="label">Rod Rate</label><input id="pR" type="number"><label class="label">Weight</label><input id="pwt" type="number" step="0.00001"><label class="label">PVC Rate</label><input id="pP" type="number"><label class="label">Labour %</label><input id="pl" type="number"><button class="btn primary" id="saveProduct" style="margin-top:17px">Save Master</button>`);if($('#saveSettings'))$('#saveSettings').onclick=()=>{data.settings={rodRate:+$('#setRod').value||0,pvcRate:+$('#setPVC').value||0};save();alert('Settings saved')};if($('#resetData'))$('#resetData').onclick=()=>{if(confirm('Reset demo data?')){localStorage.removeItem('opsnoraCareData');location.reload()}};if($('#export'))$('#export').onclick=()=>{let rows=[['Time','Size','100m Cost','200m Cost','Profit','SP100','SP200'],...data.calculations.map(c=>[c.time,c.size,c.cost100,c.cost200,c.profit,c.sp100,c.sp200])];let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));a.download='opsnora-calculations.csv';a.click();URL.revokeObjectURL(a.href)};$$('[data-auto]').forEach(x=>{let k='opsAuto_'+x.dataset.auto;if(localStorage[k]==='on')x.classList.add('on');x.onclick=()=>{x.classList.toggle('on');localStorage[k]=x.classList.contains('on')?'on':'off'}})}
 document.addEventListener('click',e=>{if(e.target.id==='saveTask'){if(!$('#nt').value.trim())return alert('Enter a task');data.tasks.unshift({id:'T'+Date.now(),title:$('#nt').value.trim(),assignee:$('#na').value||'Admin User',priority:$('#np').value,status:$('#ns').value,due:$('#nd').value});save();closeModal()}if(e.target.id==='saveUser'){if(!$('#un').value.trim()||!$('#ue').value.trim())return alert('Enter name and email');data.users.push({name:$('#un').value.trim(),username:$('#ue').value.trim(),role:$('#ur').value,status:'Active',last:'Never'});save();closeModal()}if(e.target.id==='saveOrder'){let q=+$('#oq').value||0;if(!$('#od').value.trim()||!q)return alert('Enter dealer and quantity');data.orders.unshift({id:'ORD-'+Date.now().toString().slice(-5),dealer:$('#od').value.trim(),item:$('#oi').value.trim()||'Wire',qty:q,rate:+$('#orate').value||0,received:0,history:[]});save();closeModal()}if(e.target.id==='saveProduct'){let p={size:$('#ps').value.trim(),wires:+$('#pw').value||0,rule:+$('#pr').value||0,rodRate:+$('#pR').value||0,weight:+$('#pwt').value||0,pvcRate:+$('#pP').value||0,labour:+$('#pl').value||0};if(!p.size)return alert('Enter size');data.products.push(p);save();closeModal()}if(e.target.dataset.deleteTask){data.tasks=data.tasks.filter(t=>t.id!==e.target.dataset.deleteTask);save()}if(e.target.dataset.editProduct!==undefined){let i=+e.target.dataset.editProduct,p=data.products[i];modal(`<h2>Edit Product Master</h2><label class="label">Size (inch)</label><input id="ps" value="${p.size}"><label class="label">Wires</label><input id="pw" type="number" value="${p.wires}"><label class="label">Rule</label><input id="pr" type="number" step="0.00001" value="${p.rule}"><label class="label">Rod Rate</label><input id="pR" type="number" value="${p.rodRate}"><label class="label">Weight</label><input id="pwt" type="number" step="0.00001" value="${p.weight}"><label class="label">PVC Rate</label><input id="pP" type="number" value="${p.pvcRate}"><label class="label">Labour %</label><input id="pl" type="number" value="${p.labour}"><button class="btn primary" id="updateProduct" data-index="${i}" style="margin-top:17px">Update Master</button>`)}if(e.target.id==='updateProduct'){let i=+e.target.dataset.index;data.products[i]={size:$('#ps').value.trim(),wires:+$('#pw').value||0,rule:+$('#pr').value||0,rodRate:+$('#pR').value||0,weight:+$('#pwt').value||0,pvcRate:+$('#pP').value||0,labour:+$('#pl').value||0};save();closeModal()}});document.addEventListener('change',e=>{if(e.target.dataset.taskStatus){let t=data.tasks.find(x=>x.id===e.target.dataset.taskStatus);if(t){t.status=e.target.value;save()}}});bind();refresh();
 
 // === OPSNORA COSTING OVERRIDE ===
 (function(){
-  const q=(id)=>document.querySelector(id), qa=(s)=>[...document.querySelectorAll(s)];
+  const q=(id)=>document.querySelector(id), qa=(sel)=>[...document.querySelectorAll(sel)];
   if(!q('#bundleFields')) return;
   let selectedLength='100';
   const fmt=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
@@ -36,30 +36,139 @@ document.addEventListener('click',e=>{if(e.target.id==='saveTask'){if(!$('#nt').
   const bundleFactor=()=>selectedLength==='200'?2:1;
 
   function init(){
-    const sel=q('#size'); if(sel){
+    const sel=q('#size');
+    if(sel){
       sel.innerHTML='<option value="">Select size</option>'+data.products.map(p=>`<option value="${p.size}">${p.size}</option>`).join('')+'<option value="others">Others</option>';
       sel.value='';
-      sel.addEventListener('change',()=>{q('#customSize').classList.toggle('hide',sel.value!=='others'); if(sel.value!=='others')q('#customSize').value=''; resetWeightState();});
+      sel.addEventListener('change',()=>{
+        q('#customSize').classList.toggle('hide',sel.value!=='others');
+        if(sel.value!=='others') q('#customSize').value='';
+        resetWeightState();
+      });
     }
     ['wires','rodRate','weight','pvcRate','labour','profit','customSize'].forEach(id=>{const e=q('#'+id);if(e)e.value='';});
     q('#weight')?.addEventListener('blur',adjustWeight);
     ['size','customSize','wires'].forEach(id=>q('#'+id)?.addEventListener('input',resetWeightState));
-    qa('[data-length]').forEach(b=>b.addEventListener('click',()=>{selectedLength=b.dataset.length; updateLength();}));
+    qa('[data-length]').forEach(b=>b.addEventListener('click',()=>{selectedLength=b.dataset.length;updateLength();}));
     q('#loadMaster')?.addEventListener('click',loadMasterValues);
     q('#calcBundle')?.addEventListener('click',calculateAndSave);
     q('#calcUnit')?.addEventListener('click',calculateUnitNew);
-    restoreLast(); updateLength(); renderHistory();
+    q('#historyType')?.addEventListener('change',renderHistory);
+    restoreLast();
+    updateLength();
+    renderHistory();
   }
+
   function resetWeightState(){const w=q('#weight');if(w){w.dataset.adjusted='';w.dataset.original='';}}
-  function updateLength(){qa('[data-length]').forEach(b=>b.classList.toggle('on',b.dataset.length===selectedLength));if(q('#selectedLengthOut'))q('#selectedLengthOut').textContent=selectedLength+'M';}
-  function adjustWeight(){const w=q('#weight');if(!w||w.dataset.adjusted==='1'||!w.value.trim())return;const r=rule();const entered=Number(w.value);if(!Number.isFinite(r)||!Number.isFinite(entered)||r<=0)return;w.dataset.original=entered;w.value=Math.max(0,entered-r).toFixed(5).replace(/0+$/,'').replace(/\.$/,'');w.dataset.adjusted='1';}
-  function loadMasterValues(){const p=data.products.find(x=>String(x.size)===String(q('#size').value));if(!p||q('#size').value==='others')return alert('Select a master size first.');q('#wires').value=p.wires??'';q('#rodRate').value=p.rodRate??'';q('#weight').value=p.weight??'';q('#pvcRate').value=p.pvcRate??'';q('#labour').value=p.labour??'';resetWeightState();}
-  function valid(){return [sizeVal(),Number(q('#wires').value),Number(q('#rodRate').value),Number(q('#weight').value),Number(q('#pvcRate').value),Number(q('#labour').value),Number(q('#profit').value)].every(Number.isFinite)&&q('#size').value!=='';}
-  function calculateValues(){adjustWeight();if(!valid())throw new Error('Please fill all values.');let r=rule(),f=bundleFactor(),net=Number(q('#weight').value),rod=r*Number(q('#rodRate').value)*f,pvc=net*Number(q('#pvcRate').value)*f,base=rod+pvc,lab=base*Number(q('#labour').value)/100,cost=base+lab,sell=cost*(1+Number(q('#profit').value)/100);return{r,rod,pvc,base,lab,cost,sell,net};}
-  function show(v){q('#bundleCost').textContent=fmt(v.cost);q('#bundleSelling').textContent=fmt(v.sell);[['rodOut',v.rod],['pvcOut',v.pvc],['baseOut',v.base],['labourOut',v.lab]].forEach(([id,x])=>q('#'+id).textContent=fmt(x));q('#unitCost').value=v.cost.toFixed(2);updateLength();}
-  function calculateAndSave(){try{const v=calculateValues();show(v);const item={time:new Date().toLocaleString('en-IN'),length:selectedLength+'M',size:sizeVal(),wires:Number(q('#wires').value),profit:Number(q('#profit').value),costPrice:v.cost,sellingPrice:v.sell,rod:v.rod,pvc:v.pvc,labourCost:v.lab};data.calculations.unshift(item);localStorage.setItem('opsnoraCareData',JSON.stringify(data));localStorage.setItem('opsnoraLastCosting',JSON.stringify(item));renderHistory();}catch(e){alert(e.message)}}
-  function renderHistory(){const t=q('#calcTable');if(!t)return;t.innerHTML=data.calculations.map(c=>`<tr><td>${c.time||''}</td><td>${c.length||'100M'}</td><td>${c.size}</td><td>${c.wires}</td><td>${fmt(c.costPrice??c.cost100)}</td><td>${c.profit??0}%</td><td>${fmt(c.sellingPrice??c.sp100)}</td></tr>`).join('')||'<tr><td colspan="7">No calculations saved yet.</td></tr>';}
-  function restoreLast(){const x=JSON.parse(localStorage.getItem('opsnoraLastCosting')||'null');if(!x)return;selectedLength=String(x.length||'100M').replace('M','');q('#bundleCost').textContent=fmt(x.costPrice);q('#bundleSelling').textContent=fmt(x.sellingPrice);}
-  function calculateUnitNew(){const length=Number(q('#unitLength').value),cost=Number(q('#unitCost').value),mould=Number(q('#moulding').value),profit=Number(q('#unitProfit').value);if(![length,cost,mould,profit].every(Number.isFinite)||length<=0)return alert('Please fill all unit-wise values.');const base=cost/length+mould,p=base*profit/100;q('#unitBase').textContent=fmt(cost/length);q('#mouldOut').textContent=fmt(mould);q('#unitProfitOut').textContent=fmt(p);q('#unitResult').textContent=fmt(base+p);}
+  function updateLength(){
+    qa('[data-length]').forEach(b=>b.classList.toggle('on',b.dataset.length===selectedLength));
+    if(q('#selectedLengthOut')) q('#selectedLengthOut').textContent=selectedLength+'M';
+  }
+
+  // PVC is calculated on net PVC weight: (total weight - rule) × PVC rate.
+  function adjustWeight(){
+    const w=q('#weight');
+    if(!w||w.dataset.adjusted==='1'||!w.value.trim())return;
+    const r=rule(),entered=Number(w.value);
+    if(!Number.isFinite(r)||!Number.isFinite(entered)||r<=0)return;
+    w.dataset.original=entered;
+    w.value=Math.max(0,entered-r).toFixed(5).replace(/0+$/,'').replace(/\.$/,'');
+    w.dataset.adjusted='1';
+  }
+
+  function loadMasterValues(){
+    const p=data.products.find(x=>String(x.size)===String(q('#size').value));
+    if(!p||q('#size').value==='others')return alert('Select a master size first.');
+    q('#wires').value=p.wires??'';
+    q('#rodRate').value=p.rodRate??'';
+    q('#weight').value=p.weight??'';
+    q('#pvcRate').value=p.pvcRate??'';
+    q('#labour').value=p.labour??'';
+    resetWeightState();
+  }
+
+  function valid(){
+    return [sizeVal(),Number(q('#wires').value),Number(q('#rodRate').value),Number(q('#weight').value),Number(q('#pvcRate').value),Number(q('#labour').value),Number(q('#profit').value)].every(Number.isFinite)&&q('#size').value!=='';
+  }
+
+  function calculateValues(){
+    adjustWeight();
+    if(!valid())throw new Error('Please fill all values.');
+    const r=rule(),f=bundleFactor(),net=Number(q('#weight').value);
+    const rod=r*Number(q('#rodRate').value)*f;
+    const pvc=net*Number(q('#pvcRate').value)*f;
+    const base=rod+pvc;
+    const lab=base*Number(q('#labour').value)/100;
+    const cost=base+lab;
+    const sell=cost*(1+Number(q('#profit').value)/100);
+    return{r,rod,pvc,base,lab,cost,sell,net};
+  }
+
+  function show(v){
+    q('#bundleCost').textContent=fmt(v.cost);
+    q('#bundleSelling').textContent=fmt(v.sell);
+    [['rodOut',v.rod],['pvcOut',v.pvc],['baseOut',v.base],['labourOut',v.lab]].forEach(([id,x])=>q('#'+id).textContent=fmt(x));
+    q('#unitCost').value=v.cost.toFixed(2);
+    updateLength();
+  }
+
+  function calculateAndSave(){
+    try{
+      const v=calculateValues();
+      show(v);
+      const item={
+        type:'bundle',time:new Date().toLocaleString('en-IN'),length:selectedLength+'M',size:sizeVal(),wires:Number(q('#wires').value),
+        rule:v.r,weight:Number(q('#weight').value),netWeight:v.net,pvcRate:Number(q('#pvcRate').value),rodRate:Number(q('#rodRate').value),
+        profit:Number(q('#profit').value),costPrice:v.cost,sellingPrice:v.sell,rod:v.rod,pvc:v.pvc,labourCost:v.lab
+      };
+      data.calculations.unshift(item);
+      localStorage.setItem('opsnoraCareData',JSON.stringify(data));
+      localStorage.setItem('opsnoraLastCosting',JSON.stringify(item));
+      renderHistory();
+    }catch(e){alert(e.message)}
+  }
+
+  function renderHistory(){
+    const t=q('#calcTable'),head=q('#historyHead'),mode=q('#historyType')?.value||'bundle';
+    if(!t||!head)return;
+    if(mode==='unit'){
+      head.innerHTML='<tr><th>Time</th><th>Bundle</th><th>Unit Length</th><th>Bundle Cost</th><th>Moulding</th><th>Profit %</th><th>Unit Cost</th><th>Selling Price</th></tr>';
+      t.innerHTML=data.unitCalculations.map(c=>`<tr><td>${c.time||''}</td><td>${c.bundleLength||''} · ${c.size??''}</td><td>${c.length??''}</td><td>${fmt(c.bundleCost)}</td><td>${fmt(c.moulding)}</td><td>${c.profit??0}%</td><td>${fmt(c.costPerUnit)}</td><td>${fmt(c.sellingPrice)}</td></tr>`).join('')||'<tr><td colspan="8">No unit-wise calculations saved yet.</td></tr>';
+    }else{
+      head.innerHTML='<tr><th>Time</th><th>Length</th><th>Size</th><th>Wires</th><th>Cost Price</th><th>Profit %</th><th>Selling Price</th></tr>';
+      t.innerHTML=data.calculations.map(c=>`<tr><td>${c.time||''}</td><td>${c.length||'100M'}</td><td>${c.size??''}</td><td>${c.wires??0}</td><td>${fmt(c.costPrice??c.cost100)}</td><td>${c.profit??0}%</td><td>${fmt(c.sellingPrice??c.sp100)}</td></tr>`).join('')||'<tr><td colspan="7">No bundle-wise calculations saved yet.</td></tr>';
+    }
+  }
+
+  function restoreLast(){
+    const x=JSON.parse(localStorage.getItem('opsnoraLastCosting')||'null');
+    if(!x)return;
+    selectedLength=String(x.length||'100M').replace('M','');
+    q('#bundleCost').textContent=fmt(x.costPrice??x.cost100);
+    q('#bundleSelling').textContent=fmt(x.sellingPrice??x.sp100);
+  }
+
+  function calculateUnitNew(){
+    const length=Number(q('#unitLength').value),cost=Number(q('#unitCost').value),mould=Number(q('#moulding').value),profit=Number(q('#unitProfit').value);
+    if(![length,cost,mould,profit].every(Number.isFinite)||length<=0)return alert('Please fill all unit-wise values.');
+    const base=cost/length+mould,p=base*profit/100,sp=base+p;
+    q('#unitBase').textContent=fmt(cost/length);
+    q('#mouldOut').textContent=fmt(mould);
+    q('#unitProfitOut').textContent=fmt(p);
+    q('#unitResult').textContent=fmt(sp);
+
+    const bundleItem=data.calculations[0]||{};
+    const item={
+      type:'unit',time:new Date().toLocaleString('en-IN'),bundleLength:bundleItem.length||selectedLength+'M',size:bundleItem.size??(q('#size')?.value||''),
+      length,costInput:cost,bundleCost:cost,moulding:mould,profit,costPerUnit:base,sellingPrice:sp,
+      unitBase:cost/length,profitAmount:p
+    };
+    data.unitCalculations.unshift(item);
+    localStorage.setItem('opsnoraCareData',JSON.stringify(data));
+    localStorage.setItem('opsnoraLastUnitCosting',JSON.stringify(item));
+    if(q('#historyType'))q('#historyType').value='unit';
+    renderHistory();
+  }
+
   init();
 })();

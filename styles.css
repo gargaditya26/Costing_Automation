@@ -7,3 +7,5 @@
 .leftLengthToggle button.on{background:#7542e8;color:#fff;box-shadow:0 5px 18px #7542e844}
 .shareActions{display:flex;justify-content:flex-end;gap:8px;margin:18px 0 8px;flex-wrap:wrap}
 @media(max-width:600px){.shareActions{justify-content:stretch}.shareActions .btn{flex:1}.leftLengthToggle{margin-left:0}}
+
+.sizeInputRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}.sizeInputRow select,.sizeInputRow input{min-width:0}.historyActions{display:flex;align-items:center;gap:8px}.historySelect{width:auto;min-width:130px;padding:10px 12px}.historyHint{margin:4px 0 0}.whatsappBtn{background:#25D366!important;border-color:#25D366!important;color:#fff!important;box-shadow:0 8px 22px rgba(37,211,102,.18)!important}.whatsappBtn:hover{background:#20bd5b!important;border-color:#20bd5b!important}.historySelect:focus{border-color:#25D366;box-shadow:0 0 0 3px rgba(37,211,102,.12)}@media(max-width:760px){.sizeInputRow{grid-template-columns:1fr 1fr}.historyActions{width:100%;justify-content:space-between}.historySelect{flex:1}}
