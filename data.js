@@ -4,8 +4,8 @@ const defaults={
     {size:"0.0076",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.008",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.006",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
-    {size:"0.0048",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.0052",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
+    {size:"0.0048",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.0044",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.011",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11},
     {size:"0.012",wires:0,rule:0,rodRate:1357,weight:0,pvcRate:85,labour:11}

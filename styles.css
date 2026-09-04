@@ -64,3 +64,5 @@ body.light{display:none!important}
   .license-lock-card h2{font-size:19px;padding-right:28px}
   .license-sub-overlay .license-lock-card{transform:none}
 }
+
+.iconAction{width:36px;height:36px;padding:0;display:inline-grid;place-items:center;font-size:15px}.task-actions{align-items:center}.task-actions .danger{background:#4a1827;border-color:#713044}.task-actions .editTask{background:#151d31;border-color:#2b3552}
