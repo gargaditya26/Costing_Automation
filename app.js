@@ -261,7 +261,7 @@ document.addEventListener('click',e=>{if(e.target.id==='saveTask'){if(!$('#nt').
     if(mode==='unit') head.innerHTML='<tr><th>Select</th><th>Time</th><th>Bundle</th><th>Wire Length</th><th>Total PCS</th><th>Bundle Cost</th><th>Total Moulding</th><th>Total Cost</th><th>Profit %</th><th>Unit Cost</th><th>Selling Price</th></tr>';
     else if(mode==='bundle') head.innerHTML='<tr><th>Select</th><th>Time</th><th>Length</th><th>Size</th><th>Wires</th><th>Cost Price</th><th>Profit %</th><th>Selling Price</th></tr>';
     else head.innerHTML='<tr><th>Select</th><th>Type</th><th>Time</th><th>Length</th><th>Size</th><th>Cost</th><th>Selling Price</th></tr>';
-    t.innerHTML=view.map(c=>mode==='unit'?`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c.time||''}</td><td>${c.bundleLength||''} · ${c.size??''}</td><td>${c.length??''} ${c.lengthUnit==='inch'?'Inch':c.lengthUnit==='meter'?'M':''}</td><td>${Number(c.totalPcs??0).toFixed(4)}</td><td>${fmt(c.bundleCost)}</td><td>${fmt(c.totalMoulding??c.moulding)}</td><td>${fmt(c.totalCost)}</td><td>${c.profit??0}%</td><td>${fmt(c.costPerUnit)}</td><td>${fmt(c.sellingPrice)}</td></tr>`:mode==='bundle'?`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c.time||''}</td><td>${c.length||'100M'}</td><td>${c.size??''}</td><td>${c.wires??0}</td><td>${fmt(c.cost)}</td><td>${c.profit??0}%</td><td>${fmt(c.selling)}</td></tr>`:`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c._type}</td><td>${c.time||''}</td><td>${c.length??''}</td><td>${c.size??''}</td><td>${fmt(c.cost)}</td><td>${fmt(c.selling)}</td></tr>`).join('')||`<tr><td colspan="9">No saved calculations yet.</td></tr>`;
+    t.innerHTML=view.map(c=>mode==='unit'?`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c.time||''}</td><td>${c.bundleLength||''} · ${c.size??''}</td><td>${c.length??''} ${c.lengthUnit==='inch'?'Inch':c.lengthUnit==='meter'?'M':''}</td><td>${Math.floor(Number(c.totalPcs??0))}</td><td>${fmt(c.bundleCost)}</td><td>${fmt(c.totalMoulding??c.moulding)}</td><td>${fmt(c.totalCost)}</td><td>${c.profit??0}%</td><td>${fmt(c.costPerUnit)}</td><td>${fmt(c.sellingPrice)}</td></tr>`:mode==='bundle'?`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c.time||''}</td><td>${c.length||'100M'}</td><td>${c.size??''}</td><td>${c.wires??0}</td><td>${fmt(c.cost)}</td><td>${c.profit??0}%</td><td>${fmt(c.selling)}</td></tr>`:`<tr><td><input type="checkbox" class="historyCheck" data-history-key="${c._key}"></td><td>${c._type}</td><td>${c.time||''}</td><td>${c.length??''}</td><td>${c.size??''}</td><td>${fmt(c.cost)}</td><td>${fmt(c.selling)}</td></tr>`).join('')||`<tr><td colspan="9">No saved calculations yet.</td></tr>`;
     if(q('#historyPageInfo'))q('#historyPageInfo').textContent=`${rows.length?((historyPage-1)*10+1):0}-${Math.min(historyPage*10,rows.length)} of ${rows.length} · 10 per page`; if(q('#historyPrev'))q('#historyPrev').disabled=historyPage<=1;if(q('#historyNext'))q('#historyNext').disabled=historyPage>=pages;
   }
 
@@ -282,14 +282,17 @@ document.addEventListener('click',e=>{if(e.target.id==='saveTask'){if(!$('#nt').
     if(![rawLength,bundleCost,mould,profit].every(Number.isFinite)||rawLength<=0||bundleCost<0||mould<0)return alert('Please fill all unit-wise values correctly.');
     const wireLengthMeters=lengthUnit==='inch'?rawLength*0.0254:rawLength;
     if(wireLengthMeters<=0)return alert('Wire length must be greater than 0.');
-    const totalPcs=referenceLength/wireLengthMeters;
+    const exactTotalPcs=referenceLength/wireLengthMeters;
+    // Quantity/PCS is always taken as the lower whole number. Example: 33.99 or 33.12 => 33.
+    const totalPcs=Math.floor(exactTotalPcs);
+    if(totalPcs<1)return alert('Wire length is too large for the selected bundle length. Total PCS must be at least 1.');
     const wireCost=bundleCost/totalPcs;
     const totalMoulding=mould*totalPcs;
     const totalCost=bundleCost+totalMoulding;
     const perUnitCost=totalCost/totalPcs;
     const profitAmount=perUnitCost*profit/100;
     const sp=perUnitCost+profitAmount;
-    q('#unitPcsOut').textContent=Number(totalPcs.toFixed(4)).toString();
+    q('#unitPcsOut').textContent=String(totalPcs);
     q('#unitBase').textContent=fmt(wireCost);
     q('#mouldOut').textContent=fmt(totalMoulding);
     q('#unitTotalCostOut').textContent=fmt(totalCost);
